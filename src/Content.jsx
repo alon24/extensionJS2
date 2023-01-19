@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
 function Popup() {
   const [count, setCount] = useState(0);
+
+  const port = useMemo(() => {
+    return chrome.runtime.connect({ name: "knockknock" });
+  }, []);
 
   function highlightHandler(e) {
     // get the highlighted text
@@ -11,15 +15,13 @@ function Popup() {
     // check if anything is actually highlighted
     if (text !== "") {
       // we've got a highlight, now do your stuff here
-      console.log(text);
+      port.postMessage({ highlighted: text });
     }
   }
 
   useEffect(() => {
     document.onmouseup = highlightHandler;
 
-    const port = chrome.runtime.connect({ name: "knockknock" });
-    port.postMessage({ joke: "Knock knock" });
     port.onMessage.addListener(function (msg) {
       if (msg.question === "Who's there?")
         port.postMessage({ answer: "Madame" });
@@ -30,7 +32,7 @@ function Popup() {
 
   return (
     <div className="App">
-      <h1>Content</h1>
+      <h1>ILAN contendddt</h1>
     </div>
   );
 }

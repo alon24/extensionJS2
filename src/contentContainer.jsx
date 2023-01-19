@@ -1,15 +1,12 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import "./index.css";
 import Content from "./Content.jsx";
+import { createRoot } from "react-dom/client";
 
-const root = document.createElement("div");
-root.id = "crx-root";
-document.body.append(root);
+const container = document.createElement("div");
+container.id = "crx-root";
+document.body.append(container);
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Content />
-  </React.StrictMode>,
-  root
-);
+const root = createRoot(container);
+
+root.render(<Content />);

@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
 function Popup() {
   const [count, setCount] = useState(0);
+
+  const port = useMemo(() => {
+    const port = chrome.runtime.connect({ name: "knockknock" });
+    port.onMessage.addListener(function (msg) {
+      if (msg.highlighted) console.log("got highlighted:", msg.highlighted);
+    });
+
+    return port;
+  }, []);
 
   function highlightHandler(e) {
     // get the highlighted text
