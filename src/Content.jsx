@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import reactLogo from "./assets/react.svg";
-import "./App.css";
+import "./Popup.css";
 
 function Popup() {
   const [count, setCount] = useState(0);
 
   const port = useMemo(() => {
-    return chrome.runtime.connect({ name: "knockknock" });
+    const port = chrome.runtime.connect({ name: "knockknock" });
+    port.onMessage.addListener(function (msg) {
+      if (msg.question === "Who's there?")
+        port.postMessage({ answer: "Madame" });
+      else if (msg.question === "Madame who?")
+        port.postMessage({ answer: "Madame... Bovary" });
+    });
+    return port;
   }, []);
 
   function highlightHandler(e) {
@@ -21,20 +28,9 @@ function Popup() {
 
   useEffect(() => {
     document.onmouseup = highlightHandler;
-
-    port.onMessage.addListener(function (msg) {
-      if (msg.question === "Who's there?")
-        port.postMessage({ answer: "Madame" });
-      else if (msg.question === "Madame who?")
-        port.postMessage({ answer: "Madame... Bovary" });
-    });
   }, []);
 
-  return (
-    <div className="App">
-      <h1>ILAN contendddt</h1>
-    </div>
-  );
+  return <div className="App"></div>;
 }
 
 export default Popup;

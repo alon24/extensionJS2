@@ -5,5 +5,12 @@ import manifest from "./manifest.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        welcome: "src/newPopup.html",
+      },
+    },
+  },
   plugins: [react(), crx({ manifest })],
 });

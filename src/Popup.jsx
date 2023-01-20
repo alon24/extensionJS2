@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import reactLogo from "./assets/react.svg";
-import "./App.css";
+import "./Popup.css";
 
 function Popup() {
   const [count, setCount] = useState(0);
@@ -25,7 +25,15 @@ function Popup() {
   }
 
   useEffect(() => {
-    document.onmouseup = highlightHandler;
+    const src = chrome.runtime.getURL("./newPopup.html");
+    console.log(src);
+    chrome.windows.create({
+      url: src,
+      width: 200,
+      type: "popup",
+    });
+
+    // document.onmouseup = highlightHandler;
 
     // const port = chrome.runtime.connect({ name: "knockknock" });
     // port.postMessage({ joke: "Knock knock" });
