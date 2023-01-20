@@ -13,7 +13,7 @@ chrome.runtime.onConnect.addListener((port) => {
     port.onMessage.addListener(function (msg) {
       console.log(`in back, from`, port.sender.tab.id, msg);
       if (extensionPort) {
-        extensionPort.postMessage(msg);
+        extensionPort?.port?.postMessage(msg);
       }
       // if (msg.highlighted) {
       //
@@ -46,27 +46,18 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
-// chrome.tabs.onRemoved.addListener((tabId, obj) => {
-//   if (tabId === extentionPageId + 1) {
-//     extentionPageId = null;
-//   }
-// });
+chrome.tabs.onRemoved.addListener((tabId, obj) => {
+  console.log(tabId, extensionPort?.id);
+  if (extensionPort && tabId === extensionPort?.id) {
+    extensionPort = null;
+  }
+});
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await getCurrentTab();
   if (extensionPort && activeInfo.tabId !== extensionPort?.id)
     extensionPort?.port?.postMessage({ action: "parseUsers" });
 });
-
-// function highlightHandler(e) {
-//   // get the highlighted text
-//   var text = document.getSelection();
-//   // check if anything is actually highlighted
-//   if (text !== "") {
-//     // we've got a highlight, now do your stuff here
-//     console.log(text);
-//   }
-// }
 
 // chrome.runtime.onMessage.addListener(
 //   // this is the message listener
