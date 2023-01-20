@@ -1,29 +1,73 @@
-// import html from "/src/newPopup.html?raw";
+async function getCurrentTab() {
+  let queryOptions = { active: true, lastFocusedWindow: true };
+  // `tab` will either be a `tabs.Tab` instance or `undefined`.
+  let [tab] = await chrome.tabs.query(queryOptions);
+  return tab;
+}
 
-chrome.runtime.onConnect.addListener(function (port) {
-  // console.assert(port.name === "knockknock");
-  // port.onMessage.addListener(function (msg) {
-  //   console.log(msg);
-  //   if (msg.joke === "Knock knock")
-  //     port.postMessage({ question: "Who's there?" });
-  //   else if (msg.answer === "Madame")
-  //     port.postMessage({ question: "Madame who?" });
-  //   else if (msg.answer === "Madame... Bovary")
-  //     port.postMessage({ question: "I don't get it." });
-  // });
+let ports = {};
+let extensionPort = null;
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "content" && !ports[port.sender.tab.id]) {
+    ports[port.sender.tab.id] = port;
+    port.onMessage.addListener(function (msg) {
+      console.log(`in back, from`, port.sender.tab.id, msg);
+      if (extensionPort) {
+        extensionPort.postMessage(msg);
+      }
+      // if (msg.highlighted) {
+      //
+      // }
+    });
+  }
+
+  if (port.name === "extensionPage" && !extensionPort) {
+    port.onMessage.addListener(function (msg) {
+      extensionPort = port;
+      console.log(`in extensionPage, from, ${port}`, msg);
+      // if (msg.highlighted) {
+      //   console.log(`in back, from, ${port.name}`, msg);
+      // }
+    });
+  }
 });
 
 const src = chrome.runtime.getURL("./newPopup.html");
 console.log(src);
 
+let extentionPageId = null;
 //need to call script to open newPopupWindow
-chrome.action.onClicked.addListener(function (tab) {
-  console.log("icon clicked");
-  chrome.action.onClicked.addListener((tab) => {
-    chrome.windows.create({
+chrome.action.onClicked.addListener(async (tab) => {
+  if (!extentionPageId) {
+    let newTab = await chrome.windows.create({
       url: src,
-      width: 200,
+      width: 400,
       type: "popup",
     });
-  });
+    extentionPageId = newTab.id;
+  }
 });
+
+chrome.tabs.onRemoved.addListener((tabId, obj) => {
+  if (tabId === extentionPageId + 1) {
+    extentionPageId = null;
+  }
+});
+
+// function highlightHandler(e) {
+//   // get the highlighted text
+//   var text = document.getSelection();
+//   // check if anything is actually highlighted
+//   if (text !== "") {
+//     // we've got a highlight, now do your stuff here
+//     console.log(text);
+//   }
+// }
+
+// chrome.runtime.onMessage.addListener(
+//   // this is the message listener
+//   function (request, sender, sendResponse) {
+//     if (request.message === "messageSent") runThisFunction();
+//   }
+// );
+// document.onmouseup = highlightHandler;

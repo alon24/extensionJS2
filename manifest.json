@@ -5,11 +5,15 @@
   "action": {
     "default_title": "Click to show an alert"
   },
-  "permissions": [ "activeTab","Tabs" ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "permissions": [ "activeTab", "tabs", "scripting" ],
   "content_scripts": [
     {
       "js": ["src/contentContainer.jsx"],
-      "matches": ["https://www.google.com/*"]
+      "matches": ["<all_urls>"]
     },
     {
       "matches": [

@@ -6,7 +6,8 @@ function Popup() {
   const [count, setCount] = useState(0);
 
   const port = useMemo(() => {
-    const port = chrome.runtime.connect({ name: "knockknock" });
+    const port = chrome.runtime.connect({ name: "content" });
+    port.postMessage({ msg: "hello" });
     port.onMessage.addListener(function (msg) {
       if (msg.question === "Who's there?")
         port.postMessage({ answer: "Madame" });
@@ -18,7 +19,10 @@ function Popup() {
 
   function highlightHandler(e) {
     // get the highlighted text
-    var text = document.getSelection();
+    var text = window.getSelection().toString();
+    // var text = document
+    //   .getSelection()
+    //   .anchorNode.data.substr(document.getSelection().anchorOffset);
     // check if anything is actually highlighted
     if (text !== "") {
       // we've got a highlight, now do your stuff here

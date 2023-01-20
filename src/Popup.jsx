@@ -14,26 +14,26 @@ function Popup() {
     return port;
   }, []);
 
-  function highlightHandler(e) {
-    // get the highlighted text
-    var text = document.getSelection();
-    // check if anything is actually highlighted
-    if (text !== "") {
-      // we've got a highlight, now do your stuff here
-      console.log(text);
-    }
-  }
+  // function highlightHandler(e) {
+  //   // get the highlighted text
+  //   var text = document.getSelection();
+  //   // check if anything is actually highlighted
+  //   if (text !== "") {
+  //     // we've got a highlight, now do your stuff here
+  //     console.log(text);
+  //   }
+  // }
 
   useEffect(() => {
-    const src = chrome.runtime.getURL("./newPopup.html");
-    console.log(src);
-    chrome.windows.create({
-      url: src,
-      width: 200,
-      type: "popup",
-    });
+    // const src = chrome.runtime.getURL("./newPopup.html");
+    // console.log(src);
+    // chrome.windows.create({
+    //   url: src,
+    //   width: 200,
+    //   type: "popup",
+    // });
 
-    // document.onmouseup = highlightHandler;
+    document.onmouseup = highlightHandler;
 
     // const port = chrome.runtime.connect({ name: "knockknock" });
     // port.postMessage({ joke: "Knock knock" });
