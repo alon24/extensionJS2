@@ -7,10 +7,9 @@ function Popup() {
 
   const port = useMemo(() => {
     const port = chrome.runtime.connect({ name: "content" });
-    port.postMessage({ msg: "hello" });
-    port.onMessage.addListener(function (msg) {
-      if (msg.question === "Who's there?")
-        port.postMessage({ answer: "Madame" });
+    // port.postMessage({ msg: "hello" });
+    port.onMessage.addListener((msg) => {
+      if (msg.question === "listPeople") port.postMessage({ answer: "Madame" });
       else if (msg.question === "Madame who?")
         port.postMessage({ answer: "Madame... Bovary" });
     });
@@ -32,7 +31,7 @@ function Popup() {
 
   useEffect(() => {
     document.onmouseup = highlightHandler;
-  }, []);
+  }, [port]);
 
   return <div className="App"></div>;
 }

@@ -22,8 +22,8 @@ chrome.runtime.onConnect.addListener((port) => {
   }
 
   if (port.name === "extensionPage" && !extensionPort) {
+    extensionPort = { id: port.sender.tab.id, port };
     port.onMessage.addListener(function (msg) {
-      extensionPort = port;
       console.log(`in extensionPage, from, ${port}`, msg);
       // if (msg.highlighted) {
       //   console.log(`in back, from, ${port.name}`, msg);
@@ -35,23 +35,27 @@ chrome.runtime.onConnect.addListener((port) => {
 const src = chrome.runtime.getURL("./newPopup.html");
 console.log(src);
 
-let extentionPageId = null;
 //need to call script to open newPopupWindow
 chrome.action.onClicked.addListener(async (tab) => {
-  if (!extentionPageId) {
+  if (!extensionPort) {
     let newTab = await chrome.windows.create({
       url: src,
       width: 400,
       type: "popup",
     });
-    extentionPageId = newTab.id;
   }
 });
 
-chrome.tabs.onRemoved.addListener((tabId, obj) => {
-  if (tabId === extentionPageId + 1) {
-    extentionPageId = null;
-  }
+// chrome.tabs.onRemoved.addListener((tabId, obj) => {
+//   if (tabId === extentionPageId + 1) {
+//     extentionPageId = null;
+//   }
+// });
+
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await getCurrentTab();
+  if (extensionPort && activeInfo.tabId !== extensionPort?.id)
+    extensionPort?.port?.postMessage({ action: "parseUsers" });
 });
 
 // function highlightHandler(e) {
