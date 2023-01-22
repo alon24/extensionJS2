@@ -55,9 +55,22 @@ chrome.tabs.onRemoved.addListener((tabId, obj) => {
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await getCurrentTab();
-  if (extensionPort && activeInfo.tabId !== extensionPort?.id)
-    extensionPort?.port?.postMessage({ action: "parseUsers" });
+  handlePageUpdatedOrPopupOpened(tab);
 });
+
+function handlePageUpdatedOrPopupOpened(tab) {
+  if (extensionPort && tab.tabId !== extensionPort?.id)
+    extensionPort?.port?.postMessage({ action: "parseUsers" });
+
+  if (extensionPort && tab.tabId !== extensionPort?.id) {
+    if (tab.url.includes("linkedin.com")) {
+      console.log("sending on linkedin");
+      chrome.tabs.sendMessage(tab.id, { action: "parseUsers" }, (response) => {
+        extensionPort?.port.postMessage({ ...response, tab, type: "linkedin" });
+      });
+    }
+  }
+}
 
 // chrome.runtime.onMessage.addListener(
 //   // this is the message listener

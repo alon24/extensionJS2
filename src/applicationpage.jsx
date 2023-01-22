@@ -1,12 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
+import { Linkedin } from "./components/linkedin.jsx";
 
 export const ApplicationPage = () => {
-  const [text, setText] = useState("");
+  const [highlightedText, setHighlightedText] = useState("");
+  const [pageData, setPageData] = useState({});
+
   function highlightHandler(t) {
     if (t !== "") {
       // we've got a highlight, now do your stuff here
       console.log("ilan", t);
-      setText(t);
+      setHighlightedText(t);
     }
   }
 
@@ -20,9 +23,11 @@ export const ApplicationPage = () => {
     port.postMessage({ highlighted: "hello from new page" });
 
     port.onMessage.addListener(function (msg) {
-      console.log("in app ", msg);
       if (msg.highlighted) {
         highlightHandler(msg.highlighted);
+      } else if (msg.webData) {
+        setPageData(msg);
+        console.log("got msg data");
       }
     });
   }, [port]);
@@ -30,7 +35,8 @@ export const ApplicationPage = () => {
   return (
     <div>
       <h1>I will do the work now</h1>
-      <h3>message is: {text}</h3>
+      <h3>message is: {highlightedText}</h3>
+      {pageData?.type === "linkedin" && <Linkedin data={pageData.webData} />}
     </div>
   );
 };
